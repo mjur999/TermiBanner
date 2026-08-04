@@ -1,3 +1,4 @@
+<img width="1080" height="2340" alt="257658" src="https://github.com/user-attachments/assets/d023c373-3f3c-454e-863c-cfa8e08117e1" />
 # TermiBanner
 
 A highly customizable, responsive, and multi-language web-based Terminal Banner Generator using Python Flask and Pyfiglet.
