@@ -50,3 +50,6 @@ python app.py
 </details>
 
 ---
+## Keywords
+
+Terminal Banner Generator, ASCII Banner, Pyfiglet, Python, Flask, Linux, Termux, CLI, ASCII Art, Banner Generator, Terminal Tools, Open Source.
