@@ -2,28 +2,51 @@
 
 A highly customizable, responsive, and multi-language web-based Terminal Banner Generator using Python Flask and Pyfiglet.
 
-### Installation & Usage Guide
+---
+
+## 🚀 One-Line Installation & Run
+
+### Option 1: Linux / VPS Users
 
 ```bash
-# ---------------------------------------------------
-# Option 1: For Linux Desktop / VPS Users
-# ---------------------------------------------------
+apt update && apt upgrade -y && apt install python3 git -y && git clone https://github.com/mjur999/TermiBanner.git && cd TermiBanner && pip install -r requirements.txt && python3 app.py
+```
+
+### Option 2: Android (Termux) Users
+
+```bash
+pkg update && pkg upgrade -y && pkg install python git -y && git clone https://github.com/mjur999/TermiBanner.git && cd TermiBanner && pip install -r requirements.txt && python app.py
+```
+
+---
+
+## 🛠️ Step-by-Step Installation
+
+<details>
+<summary><b>Click to view step-by-step commands</b></summary>
+
+### Linux / VPS
+
+```bash
 apt update && apt upgrade -y
-apt install python3 -y
-apt install git -y
-git clone [https://github.com/mjur999/TermiBanner.git](https://github.com/mjur999/TermiBanner.git)
+apt install python3 git -y
+git clone https://github.com/mjur999/TermiBanner.git
 cd TermiBanner
 pip install -r requirements.txt
 python3 app.py
+```
 
+### Android (Termux)
 
-# ---------------------------------------------------
-# Option 2: For Android (Termux) Users
-# ---------------------------------------------------
+```bash
 pkg update && pkg upgrade -y
-pkg install python -y
-pkg install git -y
-git clone [https://github.com/mjur999/TermiBanner.git](https://github.com/mjur999/TermiBanner.git)
+pkg install python git -y
+git clone https://github.com/mjur999/TermiBanner.git
 cd TermiBanner
 pip install -r requirements.txt
 python app.py
+```
+
+</details>
+
+---
