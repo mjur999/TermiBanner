@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Terminal Banner Generator Pro</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            color: #00ffcc;
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .lang-select {
+            width: auto !important;
+            padding: 6px 10px !important;
+            font-size: 14px !important;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 6px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ccc;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+        input[type="text"]:focus, select:focus { border-color: #00ffcc; }
+        
+        .row-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .output-container {
+            margin-top: 20px;
+            position: relative;
+            background: #050505;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto; /* রেসপনসিভ স্ক্রোলবার */
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { background: #333; }
+        .copy-btn {
+            background: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            border: none;
+        }
+        .copy-btn:hover { background: #00e6b8; }
+        .copy-btn.copied { background: #28a745; color: #fff; }
+
+        /* আউটপুট ভাঙা বন্ধ করার জন্য কাস্টম মোনোস্পেস স্টাইল */
+        pre {
+            color: #00ff00;
+            margin: 0;
+            padding: 10px;
+            overflow-x: auto;
+            white-space: pre !important; /* লাইন ব্রেকে বাধা দেয় */
+            word-break: normal !important;
+            word-wrap: normal !important;
+            font-family: 'Courier New', Courier, monospace !important; /* ফন্ট ভেঙে না যাওয়ার জন্য নির্ধারিত */
+            font-size: 13px;
+            line-height: 1.1;
+            min-height: 140px;
+            letter-spacing: 0px;
+        }
+
+        /* Fullscreen Terminal View Overlay */
+        .terminal-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            overflow: auto;
+            padding: 20px;
+        }
+        .terminal-header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111;
+            padding: 10px 15px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 15px;
+        }
+        .back-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .terminal-content {
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace !important;
+            white-space: pre !important;
+            word-wrap: normal !important;
+            font-size: 14px;
+            line-height: 1.1;
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-top">
+        <h1>Terminal Banner Generator</h1>
+        <h2>Create by mjur999</h2>
+        <!-- ভাষা নির্বাচনের ড্রপডাউন -->
+        <select id="langSelect" class="lang-select" onchange="changeLanguage()">
+            <option value="bn" selected>🇧🇩 বাংলা</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="ar">🇸🇦 العربية</option>
+            <option value="es">🇪🇸 Español</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="textInput" id="labelInput">আপনার নাম বা টেক্সট লিখুন:</label>
+        <input type="text" id="textInput" value="mjur999" placeholder="এখানে নাম লিখুন..." oninput="generateBanner()">
+    </div>
+
+    <div class="form-group row-group">
+        <div style="flex: 2;">
+            <label for="fontSelect" id="labelFont">ফন্ট সিলেক্ট করুন:</label>
+            <select id="fontSelect" onchange="generateBanner()">
+                {% for font in fonts %}
+                    <option value="{{ font }}" {% if font == 'standard' %}selected{% endif %}>{{ font }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label for="colorSelect" id="labelColor">রং বা থিম:</label>
+            <select id="colorSelect" onchange="changeColor()">
+                <option value="#00ff00" selected>Green</option>
+                <option value="#00ffcc">Cyan</option>
+                <option value="#ffff00">Yellow</option>
+                <option value="#ff4757">Red</option>
+                <option value="#ff70a6">Magenta</option>
+                <option value="#ffffff">White</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="output-container">
+        <div class="controls">
+            <button class="btn" id="btnRandom" onclick="randomFont()">🎲 Surprise Me</button>
+            <button class="btn" id="btnTerminal" onclick="openTerminalView()">Terminal View 🔍</button>
+            <button class="btn copy-btn" id="copyBtn" onclick="copyToClipboard()">Copy</button>
+        </div>
+        <pre id="bannerOutput">জেনারেট হচ্ছে...</pre>
+    </div>
+</div>
+
+<!-- Terminal View Modal -->
+<div id="terminalModal" class="terminal-modal">
+    <div class="terminal-header">
+        <button class="back-btn" id="btnBack" onclick="closeTerminalView()">← Back</button>
+        <span style="color: #888; font-size: 12px;" id="textZoomInfo">Pinch to Zoom Enabled</span>
+    </div>
+    <pre id="terminalContent" class="terminal-content"></pre>
+</div>
+
+<script>
+    // ভাষার ডিকশনারি
+    const translations = {
+        bn: {
+            labelInput: "আপনার নাম বা টেক্সট লিখুন:",
+            labelFont: "ফন্ট সিলেক্ট করুন:",
+            labelColor: "রং বা থিম:",
+            btnRandom: "🎲 Surprise Me",
+            btnTerminal: "Terminal View 🔍",
+            btnCopy: "Copy",
+            btnBack: "← ব্যাক",
+            textZoomInfo: "দুই আঙুলে জুম করার সুবিধা রয়েছে",
+            copied: "✓ কপি হয়েছে!"
+        },
+        en: {
+            labelInput: "Enter your name or text:",
+            labelFont: "Select Font:",
+            labelColor: "Color Theme:",
+            btnRandom: "🎲 Surprise Me",
+            btnTerminal: "Terminal View 🔍",
+            btnCopy: "Copy",
+            btnBack: "← Back",
+            textZoomInfo: "Pinch to Zoom Enabled",
+            copied: "✓ Copied!"
+        },
+        hi: {
+            labelInput: "अपना नाम या टेक्स्ट दर्ज करें:",
+            labelFont: "फ़ॉन्ट चुनें:",
+            labelColor: "रंग थीम:",
+            btnRandom: "🎲 Surprise Me",
+            btnTerminal: "Terminal View 🔍",
+            btnCopy: "कॉपी करें",
+            btnBack: "← वापस",
+            textZoomInfo: "ज़ूम करने की सुविधा उपलब्ध है",
+            copied: "✓ कॉपी हो गया!"
+        },
+        ar: {
+            labelInput: "أدخل اسمك أو النص:",
+            labelFont: "اختر الخط:",
+            labelColor: "نسق اللون:",
+            btnRandom: "🎲 مفاجأة",
+            btnTerminal: "عرض الشاشة 🔍",
+            btnCopy: "نسخ",
+            btnBack: "← رجوع",
+            textZoomInfo: "تم تمكين التكبير والتصغير",
+            copied: "✓ تم النسخ!"
+        },
+        es: {
+            labelInput: "Ingrese su nombre o texto:",
+            labelFont: "Seleccionar fuente:",
+            labelColor: "Tema de color:",
+            btnRandom: "🎲 Surprise Me",
+            btnTerminal: "Terminal View 🔍",
+            btnCopy: "Copiar",
+            btnBack: "← Atrás",
+            textZoomInfo: "Pellizcar para ampliar habilitado",
+            copied: "✓ ¡Copiado!"
+        }
+    };
+
+    let currentLang = 'en';
+
+    function changeLanguage() {
+        currentLang = document.getElementById('langSelect').value;
+        const t = translations[currentLang];
+
+        document.getElementById('labelInput').innerText = t.labelInput;
+        document.getElementById('labelFont').innerText = t.labelFont;
+        document.getElementById('labelColor').innerText = t.labelColor;
+        document.getElementById('btnRandom').innerText = t.btnRandom;
+        document.getElementById('btnTerminal').innerText = t.btnTerminal;
+        document.getElementById('copyBtn').innerText = t.btnCopy;
+        document.getElementById('btnBack').innerText = t.btnBack;
+        document.getElementById('textZoomInfo').innerText = t.textZoomInfo;
+    }
+
+    async function generateBanner() {
+        const text = document.getElementById('textInput').value;
+        const font = document.getElementById('fontSelect').value;
+
+        if (!text.trim()) {
+            document.getElementById('bannerOutput').innerText = '';
+            document.getElementById('terminalContent').innerText = '';
+            return;
+        }
+
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, font: font }),
+        });
+
+        const data = await response.json();
+        document.getElementById('bannerOutput').innerText = data.banner;
+        document.getElementById('terminalContent').innerText = data.banner;
+    }
+
+    function changeColor() {
+        const selectedColor = document.getElementById('colorSelect').value;
+        document.getElementById('bannerOutput').style.color = selectedColor;
+        document.getElementById('terminalContent').style.color = selectedColor;
+    }
+
+    function copyToClipboard() {
+        const bannerText = document.getElementById('bannerOutput').innerText;
+        const btn = document.getElementById('copyBtn');
+        const t = translations[currentLang];
+
+        if (bannerText && bannerText.trim() !== '') {
+            navigator.clipboard.writeText(bannerText).then(() => {
+                btn.innerHTML = t.copied;
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = t.btnCopy;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    }
+
+    function randomFont() {
+        const select = document.getElementById('fontSelect');
+        const items = select.options;
+        const randomIndex = Math.floor(Math.random() * items.length);
+        select.selectedIndex = randomIndex;
+        generateBanner();
+    }
+
+    function openTerminalView() {
+        document.getElementById('terminalModal').style.display = 'block';
+        history.pushState({ modalOpen: true }, "", "#terminal");
+    }
+
+    function closeTerminalView() {
+        document.getElementById('terminalModal').style.display = 'none';
+        if (location.hash === "#terminal") {
+            history.back();
+        }
+    }
+
+    window.addEventListener('popstate', function (event) {
+        if (document.getElementById('terminalModal').style.display === 'block') {
+            document.getElementById('terminalModal').style.display = 'none';
+        }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+        generateBanner();
+    });
+</script>
+
+</body>
+</html>
